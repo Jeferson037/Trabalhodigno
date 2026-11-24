@@ -508,11 +508,7 @@
       return;
     }
     map = L.map("panel-map", { minZoom: 3 }).setView([-15.8, -47.9], 4);
-    L.tileLayer(window.TD.TILE_URL, {
-      maxZoom: 19,
-      subdomains: "abcd",
-      attribution: window.TD.TILE_ATTRIBUTION
-    }).addTo(map);
+    window.TD.addBaseLayer(map);
     savedLayer = L.layerGroup().addTo(map);
     map.on("click", event => setPoint(event.latlng.lat, event.latlng.lng, false));
     renderSavedMarkers();
