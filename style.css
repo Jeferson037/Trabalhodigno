@@ -477,3 +477,29 @@ footer { position: relative; }
   .channel-list { grid-template-columns: 1fr; }
   .form-frame { height: 60vh; }
 }
+
+/* =========================================================
+   Botão do jogo "Cidade Consciente" (card de canais oficiais)
+   ========================================================= */
+.hero-card a.game-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 18px;
+  padding: 14px 16px;
+  color: var(--navy);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff7ed, #ffe3c7);
+  box-shadow: 0 12px 28px rgba(60, 20, 4, .22);
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.hero-card a.game-card:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(60, 20, 4, .3); }
+.game-icon { display: grid; flex: 0 0 44px; width: 44px; height: 44px; color: white; border-radius: 13px; background: linear-gradient(135deg, var(--blue), var(--blue-dark)); font-size: 18px; place-items: center; }
+.game-text { display: grid; flex: 1 1 0; gap: 1px; min-width: 0; }
+.game-text small { color: var(--blue-dark); font-size: 10px; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
+.game-text strong { color: var(--navy); font-size: 17px; line-height: 1.2; }
+.game-text > span { color: #7a5540; font-size: 12px; line-height: 1.35; }
+.game-cta { flex: 1 1 100%; padding: 9px 12px; text-align: center; color: white; border-radius: 10px; background: var(--blue); font-size: 13px; font-weight: 800; white-space: nowrap; }
