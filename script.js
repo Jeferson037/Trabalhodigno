@@ -5,8 +5,43 @@
    ========================================================= */
 
 const DATA_SCRIPT = "data/denuncias.js";
-const TILE_URL = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
-const TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+/* Mapas base: OpenStreetMap (exige o cabeçalho Referer, enviado pelo GitHub Pages)
+   e, como reserva automática, o mapa de ruas da Esri. Nenhum dos dois exige chave. */
+const TILE_PROVIDERS = [
+  {
+    url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    options: {
+      maxZoom: 19,
+      referrerPolicy: "strict-origin-when-cross-origin",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }
+  },
+  {
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+    options: {
+      maxZoom: 19,
+      attribution: 'Mapa &copy; Esri — dados &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }
+  }
+];
+
+/* Adiciona o mapa base e troca para o reserva se o principal falhar */
+function addBaseLayer(targetMap) {
+  let layer;
+  const use = index => {
+    if (layer) targetMap.removeLayer(layer);
+    let errors = 0;
+    const provider = TILE_PROVIDERS[index];
+    layer = L.tileLayer(provider.url, provider.options).addTo(targetMap);
+    layer.on("tileerror", () => {
+      errors += 1;
+      if (errors === 4 && index < TILE_PROVIDERS.length - 1) use(index + 1);
+    });
+  };
+  // aberto direto do computador (file://) não há Referer: vai direto para o reserva
+  use(location.protocol === "file:" ? 1 : 0);
+}
 
 const severityStyle = {
   moderada: { label: "Moderada", legend: "low" },
@@ -100,11 +135,9 @@ async function loadData() {
     await loadScript(DATA_SCRIPT + cacheBust());
     setData(window.TRABALHO_DIGNO_DATA || { locais: [] });
   } catch (error) {
-    console.warn("Não foi possível carregar os dados do mapa:", error);
-    loadError = true;
-    dataLoaded = true;
-    document.getElementById("map-badge").textContent = "Dados indisponíveis";
-    renderCompanies(document.getElementById("region-search").value);
+    // data/denuncias.js ainda não existe: o painel cria o arquivo na primeira publicação
+    console.warn("data/denuncias.js não encontrado — mapa iniciado sem endereços.", error);
+    setData({ locais: [] });
   }
 }
 
@@ -114,8 +147,7 @@ window.TD = {
   getData: () => JSON.parse(JSON.stringify(currentData)),
   loadScript,
   cacheBust,
-  TILE_URL,
-  TILE_ATTRIBUTION
+  addBaseLayer
 };
 
 /* ---------- mapa ---------- */
@@ -138,11 +170,7 @@ function initMap() {
     minZoom: 3
   }).setView([-15.8, -47.9], 4);
 
-  L.tileLayer(TILE_URL, {
-    maxZoom: 19,
-    subdomains: "abcd",
-    attribution: TILE_ATTRIBUTION
-  }).addTo(map);
+  addBaseLayer(map);
 }
 
 function createCompanyIcon(company) {
