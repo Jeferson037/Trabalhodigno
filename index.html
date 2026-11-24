@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Mapa de conscientização e relatos anônimos sobre trabalho infantil e trabalho análogo à escravidão." />
+  <title>Trabalho Digno | Mapa de Conscientização</title>
+
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="preconnect" href="https://a.basemaps.cartocdn.com" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="painel.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="Ir para o início">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="img">
+          <path d="M24 4 6 12v12c0 10.8 7.6 17.2 18 20 10.4-2.8 18-9.2 18-20V12L24 4Z" fill="currentColor" opacity=".18"/>
+          <path d="M15 25.5 21 31l12-14" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span>
+        <strong>Trabalho Digno</strong>
+        <small>Conscientizar, prevenir e denunciar</small>
+      </span>
+    </a>
+
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a href="#mapa">Mapa</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#orientacoes">Orientações</a>
+    </nav>
+
+    <button class="btn btn-primary" data-open-report>
+      <span>＋</span> Fazer relato anônimo
+    </button>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-copy">
+        <span class="eyebrow">Projeto de conscientização social</span>
+        <h1>Informação segura para ajudar a combater formas ilegais de trabalho.</h1>
+        <p>
+          Um espaço para visualizar áreas de atenção, conhecer sinais de exploração e registrar relatos anônimos que poderão apoiar ações educativas e de fiscalização.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-large" href="#mapa">Explorar o mapa</a>
+          <button class="btn btn-ghost btn-large" data-open-report>Enviar um relato</button>
+        </div>
+        <div class="trust-row" aria-label="Características do projeto">
+          <span>✓ Relatos anônimos</span>
+          <span>✓ Dados moderados</span>
+          <span>✓ Foco educativo</span>
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <div class="hero-card-icon">!</div>
+        <div>
+          <span class="card-label">Em caso de risco imediato</span>
+          <h2>Procure os canais oficiais</h2>
+          <p>Este site não substitui autoridades, serviços de emergência ou canais oficiais de denúncia.</p>
+
+          <div class="channel-group" aria-label="Ligar para canais oficiais">
+            <span class="channel-title">Ligue gratuitamente</span>
+            <div class="channel-list">
+              <a class="channel" href="tel:100">
+                <span class="channel-icon">☎</span>
+                <span><strong>Disque 100</strong><small>Direitos Humanos · 24h</small></span>
+              </a>
+              <a class="channel" href="tel:190">
+                <span class="channel-icon">☎</span>
+                <span><strong>190</strong><small>Polícia · emergência</small></span>
+              </a>
+              <a class="channel" href="https://wa.me/5561996110100" target="_blank" rel="noopener">
+                <span class="channel-icon">✆</span>
+                <span><strong>WhatsApp</strong><small>Disque 100 · (61) 99611-0100</small></span>
+              </a>
+            </div>
+          </div>
+
+          <div class="channel-group" aria-label="Sites oficiais de denúncia">
+            <span class="channel-title">Denuncie pela internet</span>
+            <div class="channel-list">
+              <a class="channel" href="https://ipe.sit.trabalho.gov.br" target="_blank" rel="noopener">
+                <span class="channel-icon">↗</span>
+                <span><strong>Sistema Ipê</strong><small>Trabalho escravo · anônimo</small></span>
+              </a>
+              <a class="channel" href="https://ipetrabalhoinfantil.trabalho.gov.br" target="_blank" rel="noopener">
+                <span class="channel-icon">↗</span>
+                <span><strong>Ipê Trabalho Infantil</strong><small>Ministério do Trabalho</small></span>
+              </a>
+              <a class="channel" href="https://www.mpt.mp.br" target="_blank" rel="noopener">
+                <span class="channel-icon">↗</span>
+                <span><strong>MPT</strong><small>Ministério Público do Trabalho</small></span>
+              </a>
+            </div>
+          </div>
+
+          <a href="#orientacoes">Ver orientações de segurança →</a>
+        </div>
+      </aside>
+    </section>
+
+    <section class="stats" aria-label="Indicadores do mapa">
+      <article>
+        <span class="stat-icon stat-blue">◎</span>
+        <div><strong id="stat-addresses">0</strong><span>endereços denunciados</span></div>
+      </article>
+      <article>
+        <span class="stat-icon stat-orange">◈</span>
+        <div><strong id="stat-reports">0</strong><span>relatos registrados</span></div>
+      </article>
+      <article>
+        <span class="stat-icon stat-green">✓</span>
+        <div><strong id="stat-confirmed">0</strong><span>casos confirmados</span></div>
+      </article>
+      <article>
+        <span class="stat-icon stat-purple">◌</span>
+        <div><strong id="stat-critical">0</strong><span>casos muito graves</span></div>
+      </article>
+    </section>
+
+    <section class="map-section" id="mapa">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">Mapa de atenção</span>
+          <h2>Locais com casos denunciados</h2>
+          <p>O mapa reúne empresas e endereços denunciados por situações ilegais de trabalho, classificados por gravidade e pela etapa de análise em que cada caso se encontra.</p>
+        </div>
+        <div class="map-controls" aria-label="Filtros do mapa">
+          <button class="filter active" data-filter="todos">Todos</button>
+          <button class="filter" data-filter="infantil">Trabalho infantil</button>
+          <button class="filter" data-filter="analogo">Trabalho análogo à escravidão</button>
+        </div>
+      </div>
+
+      <div class="map-layout">
+        <aside class="map-sidebar">
+          <div class="search-box">
+            <label for="region-search">Buscar empresa ou região</label>
+            <div class="search-input">
+              <span>⌕</span>
+              <input id="region-search" type="search" placeholder="Digite o nome, endereço ou região" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="legend-card">
+            <h3>Gravidade do caso</h3>
+            <div><span class="legend-dot low"></span><p><strong>Moderada</strong><small>Requer atenção e acompanhamento</small></p></div>
+            <div><span class="legend-dot medium"></span><p><strong>Grave</strong><small>Exige fiscalização e correção</small></p></div>
+            <div><span class="legend-dot high"></span><p><strong>Muito grave</strong><small>Risco elevado às vítimas</small></p></div>
+          </div>
+
+          <div class="info-card">
+            <span>i</span>
+            <p>Os locais são cadastrados pela equipe do projeto a partir dos relatos recebidos. Cada marcador indica a gravidade e se o caso foi apenas denunciado, está em apuração ou já foi confirmado.</p>
+          </div>
+        </aside>
+
+        <div class="map-wrapper">
+          <div id="map" aria-label="Mapa interativo de locais com casos denunciados"></div>
+          <div class="map-empty" id="map-empty" hidden></div>
+          <div class="map-badge" id="map-badge">Carregando dados…</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-section" id="como-funciona">
+      <div class="section-heading centered">
+        <span class="eyebrow">Como funciona</span>
+        <h2>Um fluxo simples, seguro e responsável</h2>
+        <p>O objetivo é transformar relatos em informação responsável. Somente casos analisados pela equipe aparecem vinculados a empresas e endereços no mapa.</p>
+      </div>
+
+      <div class="steps-grid">
+        <article>
+          <span class="step-number">01</span>
+          <div class="step-icon">✎</div>
+          <h3>Relato anônimo</h3>
+          <p>A pessoa descreve a situação sem informar nome, documento ou dados pessoais.</p>
+        </article>
+        <article>
+          <span class="step-number">02</span>
+          <div class="step-icon">⌕</div>
+          <h3>Moderação</h3>
+          <p>O conteúdo passa por análise antes de qualquer exibição pública no mapa.</p>
+        </article>
+        <article>
+          <span class="step-number">03</span>
+          <div class="step-icon">◉</div>
+          <h3>Dados agregados</h3>
+          <p>Após a análise, o caso pode ser exibido no mapa com sua gravidade, situação e localização.</p>
+        </article>
+        <article>
+          <span class="step-number">04</span>
+          <div class="step-icon">↗</div>
+          <h3>Encaminhamento</h3>
+          <p>Casos relevantes podem ser orientados aos canais oficiais apropriados.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="guidance-section" id="orientacoes">
+      <div class="guidance-copy">
+        <span class="eyebrow light">Orientações importantes</span>
+        <h2>Reconheça sinais e aja com segurança.</h2>
+        <p>Não confronte possíveis responsáveis e não coloque a si mesmo ou outras pessoas em risco. Registre apenas informações observadas diretamente e procure os canais oficiais.</p>
+        <button class="btn btn-light" data-open-report>Registrar relato</button>
+      </div>
+
+      <div class="signal-list">
+        <article><span>1</span><p><strong>Jornadas excessivas</strong><small>Trabalho por muitas horas, sem pausas ou descanso adequado.</small></p></article>
+        <article><span>2</span><p><strong>Restrição de liberdade</strong><small>Impedimento de sair do local ou retenção de documentos.</small></p></article>
+        <article><span>3</span><p><strong>Crianças trabalhando</strong><small>Atividades incompatíveis com idade, escola, saúde ou segurança.</small></p></article>
+        <article><span>4</span><p><strong>Condições degradantes</strong><small>Ambiente sem higiene, proteção, alimentação ou alojamento adequado.</small></p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>
+      <strong>Trabalho Digno</strong>
+      <p>Projeto de conscientização sobre trabalho infantil e trabalho análogo à escravidão.</p>
+    </div>
+    <p>Desenvolvido para fins educacionais.</p>
+    <a class="footer-admin" href="#painel" rel="nofollow" aria-label="Área restrita" data-open-admin>·</a>
+  </footer>
+
+  <div class="modal" id="report-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-report></div>
+    <section class="modal-card modal-card-form" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" data-close-report aria-label="Fechar formulário">×</button>
+      <span class="eyebrow">Relato anônimo</span>
+      <h2 id="modal-title">Conte o que você observou</h2>
+      <p class="modal-intro">Não informe nomes, documentos, telefone ou qualquer dado pessoal. Em caso de risco imediato, ligue <a href="tel:190">190</a> ou <a href="tel:100">Disque 100</a>.</p>
+
+      <div class="form-frame">
+        <div class="form-frame-loading" id="form-loading">Carregando formulário…</div>
+        <iframe id="report-iframe" title="Formulário de relato anônimo" data-src="https://docs.google.com/forms/d/e/1FAIpQLSeNcjlKiUwv1D-IM8hENPrpyyF45IeGfFAxP332H2fHI5eC0w/viewform?embedded=true" loading="lazy">Carregando…</iframe>
+      </div>
+
+      <div class="modal-actions">
+        <a class="btn btn-ghost" href="https://forms.gle/kuXJkHNnTmp7io4Y8" target="_blank" rel="noopener">Abrir em nova aba ↗</a>
+        <button class="btn btn-primary" type="button" data-close-report>Fechar</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================== ÁREA RESTRITA ===================== -->
+  <div class="modal" id="login-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-login></div>
+    <section class="modal-card login-card" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <button class="modal-close" data-close-login aria-label="Fechar">×</button>
+      <span class="eyebrow">Área restrita</span>
+      <h2 id="login-title">Painel de controle</h2>
+      <p class="modal-intro">Digite a senha para gerenciar os endereços exibidos no mapa.</p>
+
+      <form id="login-form" class="login-form">
+        <label>Senha
+          <span class="password-field">
+            <input id="login-password" type="password" autocomplete="current-password" required />
+            <button type="button" class="link-btn" id="login-toggle" aria-label="Mostrar senha">Mostrar</button>
+          </span>
+        </label>
+        <div class="form-message" id="login-message" role="status"></div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" type="button" data-close-login>Cancelar</button>
+          <button class="btn btn-primary" type="submit" id="login-submit">Entrar</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="admin" id="admin" aria-hidden="true">
+    <div class="admin-shell" role="dialog" aria-modal="true" aria-labelledby="admin-title">
+      <header class="admin-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="img">
+              <path d="M24 4 6 12v12c0 10.8 7.6 17.2 18 20 10.4-2.8 18-9.2 18-20V12L24 4Z" fill="currentColor" opacity=".18"/>
+              <path d="M15 25.5 21 31l12-14" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span>
+            <strong id="admin-title">Painel de controle</strong>
+            <small>Trabalho Digno · área restrita</small>
+          </span>
+        </div>
+        <div class="admin-header-actions">
+          <span class="sync-pill" id="sync-pill">Carregando…</span>
+          <button class="btn btn-ghost btn-sm" type="button" id="admin-logout">Sair</button>
+        </div>
+      </header>
+
+      <div class="admin-content">
+        <div class="panel-page">
+          <div class="panel-title">
+            <div>
+              <h1>Endereços denunciados</h1>
+              <p>Cadastre locais, defina a gravidade e a situação de cada caso e publique as alterações no mapa do site.</p>
+            </div>
+          </div>
+
+          <div class="panel-banner" id="draft-banner" hidden>
+            <span>Existem alterações não publicadas salvas neste navegador.</span>
+            <div>
+              <button class="btn btn-ghost btn-sm" id="draft-discard" type="button">Descartar</button>
+              <button class="btn btn-primary btn-sm" id="draft-restore" type="button">Restaurar</button>
+            </div>
+          </div>
+
+          <!-- Conexão com o GitHub -->
+          <details class="panel-card gh-card" id="gh-card">
+            <summary>
+              <span class="gh-summary-icon">⚙</span>
+              <span><strong>Publicação no GitHub</strong><small id="gh-summary-status">Não configurada</small></span>
+            </summary>
+
+            <div class="gh-body">
+              <div id="gh-connected" hidden>
+                <p class="panel-help">Publicando em <strong id="gh-connected-repo"></strong>. O token está guardado criptografado com a senha do painel, em <code>data/acesso.js</code>.</p>
+                <div class="panel-actions">
+                  <button class="btn btn-ghost" type="button" id="gh-change">Alterar conexão</button>
+                </div>
+              </div>
+
+              <form id="gh-form" class="panel-form-grid">
+                <p class="panel-help span-2">
+                  Para que o botão <strong>Publicar no site</strong> funcione, informe uma vez um <strong>token de acesso</strong> do GitHub (fine-grained) com permissão
+                  <em>Contents: Read and write</em> apenas neste repositório. Ele será <strong>criptografado com a senha do painel</strong> e salvo no repositório,
+                  então depois basta a senha, em qualquer computador.
+                </p>
+                <label>Usuário ou organização
+                  <input id="gh-owner" type="text" placeholder="ex.: alicesodre" autocomplete="off" required />
+                </label>
+                <label>Repositório
+                  <input id="gh-repo" type="text" placeholder="ex.: trabalho-digno" autocomplete="off" required />
+                </label>
+                <label>Branch
+                  <input id="gh-branch" type="text" value="main" autocomplete="off" required />
+                </label>
+                <label>Token de acesso
+                  <input id="gh-token" type="password" placeholder="github_pat_…" autocomplete="off" required />
+                </label>
+                <div class="panel-actions span-2">
+                  <button class="btn btn-ghost" type="button" id="gh-cancel" hidden>Cancelar</button>
+                  <button class="btn btn-primary" type="submit" id="gh-submit">Conectar e salvar</button>
+                </div>
+              </form>
+            </div>
+          </details>
+
+          <!-- Cadastro + mapa -->
+          <div class="panel-grid">
+            <section class="panel-card">
+              <div class="panel-card-head">
+                <h2 id="form-title">Cadastrar endereço</h2>
+                <button class="link-btn" type="button" id="form-cancel" hidden>Cancelar edição</button>
+              </div>
+
+              <form id="location-form" novalidate>
+                <input type="hidden" id="loc-id" />
+
+                <label>Nome da empresa ou local *
+                  <input id="loc-name" type="text" maxlength="120" placeholder="ex.: Oficina de costura" required />
+                </label>
+
+                <label>Endereço
+                  <input id="loc-address" type="text" maxlength="160" placeholder="Rua, número, bairro" />
+                </label>
+
+                <div class="panel-form-grid">
+                  <label>Cidade *
+                    <input id="loc-city" type="text" maxlength="80" required />
+                  </label>
+                  <label>Estado *
+                    <select id="loc-state" required></select>
+                  </label>
+                </div>
+
+                <div class="locate-row">
+                  <button class="btn btn-ghost" type="button" id="locate-btn">⌖ Localizar no mapa</button>
+                  <span class="coords" id="coords-label">Sem localização — busque o endereço ou clique no mapa</span>
+                </div>
+                <input type="hidden" id="loc-lat" />
+                <input type="hidden" id="loc-lng" />
+
+                <div class="panel-form-grid">
+                  <label>Tipo de situação *
+                    <select id="loc-type" required>
+                      <option value="infantil">Trabalho infantil</option>
+                      <option value="analogo">Trabalho análogo à escravidão</option>
+                    </select>
+                  </label>
+                  <label>Situação do caso *
+                    <select id="loc-status" required>
+                      <option value="denunciado">Denúncia recebida</option>
+                      <option value="apuracao">Em apuração</option>
+                      <option value="confirmado">Caso confirmado</option>
+                    </select>
+                  </label>
+                </div>
+
+                <fieldset class="severity-picker">
+                  <legend>Gravidade *</legend>
+                  <label><input type="radio" name="loc-severity" value="moderada" checked /><span><i class="legend-dot low"></i>Moderada</span></label>
+                  <label><input type="radio" name="loc-severity" value="grave" /><span><i class="legend-dot medium"></i>Grave</span></label>
+                  <label><input type="radio" name="loc-severity" value="muito_grave" /><span><i class="legend-dot high"></i>Muito grave</span></label>
+                </fieldset>
+
+                <div class="panel-form-grid">
+                  <label>Nº de relatos
+                    <input id="loc-reports" type="number" min="0" step="1" value="1" />
+                  </label>
+                  <label>Data do registro
+                    <input id="loc-date" type="date" />
+                  </label>
+                </div>
+
+                <label>Descrição (aparece no mapa)
+                  <textarea id="loc-description" rows="4" maxlength="600" placeholder="Resumo objetivo da situação, sem identificar vítimas ou denunciantes."></textarea>
+                </label>
+
+                <div class="form-message" id="loc-message" role="status"></div>
+
+                <div class="panel-actions">
+                  <button class="btn btn-ghost" type="reset" id="form-reset">Limpar</button>
+                  <button class="btn btn-primary" type="submit" id="form-submit">Adicionar endereço</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel-card panel-map-card">
+              <div class="panel-card-head">
+                <h2>Localização</h2>
+                <small>Clique no mapa ou arraste o marcador para ajustar</small>
+              </div>
+              <div id="panel-map"></div>
+            </section>
+          </div>
+
+          <!-- Lista -->
+          <section class="panel-card">
+            <div class="panel-card-head list-head">
+              <h2>Cadastrados <span class="count" id="list-count">0</span></h2>
+              <div class="search-input">
+                <span>⌕</span>
+                <input id="list-search" type="search" placeholder="Filtrar por nome, cidade ou estado" autocomplete="off" />
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="panel-table">
+                <thead>
+                  <tr>
+                    <th>Local</th>
+                    <th>Cidade</th>
+                    <th>Tipo</th>
+                    <th>Gravidade</th>
+                    <th>Situação</th>
+                    <th>Relatos</th>
+                    <th aria-label="Ações"></th>
+                  </tr>
+                </thead>
+                <tbody id="list-body"></tbody>
+              </table>
+              <p class="table-empty" id="list-empty">Nenhum endereço cadastrado.</p>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="publish-bar">
+        <span class="publish-state" id="publish-state">Tudo publicado</span>
+        <div class="publish-actions">
+          <label class="btn btn-ghost btn-sm" for="import-file">Importar arquivo</label>
+          <input id="import-file" type="file" accept=".js,.json,application/json,text/javascript" hidden />
+          <button class="btn btn-ghost btn-sm" type="button" id="download-btn">Baixar arquivo</button>
+          <button class="btn btn-primary" type="button" id="publish-btn">Publicar no site</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+  <script src="painel.js"></script>
+</body>
+</html>
